@@ -1,9 +1,9 @@
 name: 48-Hour Apify Actor Health Canary
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '17 3 */2 * *'
-  workflow_dispatch:
 
 jobs:
   canary:
@@ -14,7 +14,6 @@ jobs:
         with:
           node-version: '22'
       - name: Run parallel smoke tests across all 8 Actors
-        if: ${{ secrets.APIFY_TOKEN != '' }}
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: node scripts/canary.mjs
