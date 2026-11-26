@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.yashik1991/olviklabs-b2b-mcp-servers",
+  "title": "Olvik Labs B2B & Financial Intelligence MCP",
+  "description": "8 B2B intelligence MCP tools: SEC EDGAR XBRL, GovTech RFPs, SaaS pricing, App Store ASO, RAG docs & Bluesky.",
+  "version": "1.1.0",
+  "websiteUrl": "https://olviklabs.com",
+  "repository": {
+    "url": "https://github.com/yashik1991/olviklabs-b2b-mcp-servers",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.apify.com/?actors=olviklabs/sec-edgar-filing-intelligence,olviklabs/saas-pricing-intelligence,olviklabs/gov-tenders-intelligence,olviklabs/appstore-aso-review-intelligence,olviklabs/llm-docs-rag-extractor,olviklabs/chrome-extension-analyzer,olviklabs/wordpress-plugin-intelligence,olviklabs/bluesky-brand-intelligence",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token from Apify Console (e.g. Bearer apify_api_...)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
