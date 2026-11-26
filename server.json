@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.yashik1991/olviklabs-b2b-mcp-servers",
   "title": "Olvik Labs B2B & Financial Intelligence MCP",
-  "description": "8 B2B intelligence MCP tools: SEC EDGAR XBRL, GovTech RFPs, SaaS pricing, App Store ASO, RAG docs & Bluesky.",
+  "description": "B2B & financial MCP tools: SEC EDGAR XBRL, GovTech RFPs, SaaS pricing, App Store ASO & RAG.",
   "version": "1.1.0",
   "websiteUrl": "https://olviklabs.com",
   "repository": {
