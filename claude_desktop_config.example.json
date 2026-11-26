@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "olviklabs-b2b-intelligence": {
+      "url": "https://mcp.apify.com/?actors=olviklabs/sec-edgar-filing-intelligence,olviklabs/saas-pricing-intelligence,olviklabs/gov-tenders-intelligence,olviklabs/appstore-aso-review-intelligence,olviklabs/llm-docs-rag-extractor,olviklabs/chrome-extension-analyzer,olviklabs/wordpress-plugin-intelligence,olviklabs/bluesky-brand-intelligence",
+      "headers": {
+        "Authorization": "Bearer YOUR_APIFY_API_TOKEN"
+      }
+    }
+  }
+}

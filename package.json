@@ -1,0 +1,24 @@
+{
+  "name": "olviklabs-b2b-mcp-servers",
+  "version": "1.0.0",
+  "description": "8 hosted Model Context Protocol (MCP) tools for SEC EDGAR XBRL financials, GovTech RFP tenders, B2B SaaS pricing tracking, App Store ASO, Chrome Web Store, WordPress churn, Bluesky AT Protocol, and RAG llms.txt extraction.",
+  "homepage": "https://olviklabs.com",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "claude-desktop",
+    "cursor",
+    "windsurf",
+    "sec-edgar",
+    "xbrl",
+    "saas-pricing",
+    "government-tenders",
+    "app-store-aso",
+    "llms-txt",
+    "rag",
+    "bluesky",
+    "apify"
+  ]
+}
