@@ -1,59 +1,74 @@
-# Olvik Labs — B2B, Financial & Developer Intelligence MCP Servers
+# Olvik Labs B2B, Financial & Developer Intelligence MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![MCP Ready](https://img.shields.io/badge/MCP-Streamable%20HTTP%20%2F%20SSE-2563eb)](https://mcp.apify.com)
-[![Publisher: Olvik Labs](https://img.shields.io/badge/Publisher-Olvik%20Labs-0f172a)](https://apify.com/olviklabs)
+[![MCP SDK](https://img.shields.io/badge/%40modelcontextprotocol%2Fsdk-1.12%2B-2563eb)](./package.json)
+[![Publisher: Olvik Labs](https://img.shields.io/badge/Publisher-Olvik%20Labs-0f172a)](https://olviklabs.com)
 
-Zero-install **Model Context Protocol (MCP)** tools for **Claude Desktop, Claude Code, Cursor, Windsurf, Cline, n8n, and LangChain** — powered by official public APIs and clean Markdown extractors hosted on [Apify MCP (`mcp.apify.com`)](https://apify.com/olviklabs).
+An open-source **TypeScript Model Context Protocol (`@modelcontextprotocol/sdk`) stdio server** (`src/index.ts`) providing **8 read-only intelligence tools** for **Claude Desktop, Claude Code, Cursor, Windsurf, Cline, and Glama**:
 
----
-
-## Included MCP Tools (8 Production Servers)
-
-| MCP Tool / Actor | Primary Data Source | Key Output for AI Agents | Apify Store & Docs |
-| :--- | :--- | :--- | :--- |
-| **[SEC EDGAR Filings & XBRL Financials](https://apify.com/olviklabs/sec-edgar-filing-intelligence)** | Official US SEC EDGAR (`data.sec.gov`) | `10-K`, `10-Q`, `8-K`, `Form 4` + latest GAAP Revenue, Net Income, Cash, Assets | [`olviklabs/sec-edgar-filing-intelligence`](https://apify.com/olviklabs/sec-edgar-filing-intelligence) |
-| **[SaaS Pricing & Plan Change Tracker](https://apify.com/olviklabs/saas-pricing-intelligence)** | B2B SaaS `/pricing` pages | Plan tiers, price points, free-tier/enterprise flags, SHA-256 change hash & Markdown | [`olviklabs/saas-pricing-intelligence`](https://apify.com/olviklabs/saas-pricing-intelligence) |
-| **[Public Government Tenders & RFPs](https://apify.com/olviklabs/gov-tenders-intelligence)** | UK Contracts Finder (OCDS) + World Bank (140+ countries) | Open RFP titles, GBP/USD contract budgets, buyer emails, CPV codes & deadlines | [`olviklabs/gov-tenders-intelligence`](https://apify.com/olviklabs/gov-tenders-intelligence) |
-| **[App Store ASO & Multi-Country Reviews](https://apify.com/olviklabs/appstore-aso-review-intelligence)** | Apple iTunes Search & Storefront RSS (40+ countries) | iOS & Mac App Store keyword rankings, versions, and 1–2 star competitor reviews | [`olviklabs/appstore-aso-review-intelligence`](https://apify.com/olviklabs/appstore-aso-review-intelligence) |
-| **[LLM / RAG Clean Docs & `llms.txt` Extractor](https://apify.com/olviklabs/llm-docs-rag-extractor)** | `llms.txt`, `sitemap.xml` & technical docs | Deduplicated, token-sized Markdown chunks with YAML frontmatter for RAG | [`olviklabs/llm-docs-rag-extractor`](https://apify.com/olviklabs/llm-docs-rag-extractor) |
-| **[Chrome Web Store Opportunity Analyzer](https://apify.com/olviklabs/chrome-extension-analyzer)** | Chrome Web Store listings | Active user counts, star ratings, days since update & 0–100 Micro-SaaS Score | [`olviklabs/chrome-extension-analyzer`](https://apify.com/olviklabs/chrome-extension-analyzer) |
-| **[WordPress Plugin Churn & Review Miner](https://apify.com/olviklabs/wordpress-plugin-intelligence)** | Official WordPress.org Plugin API (60k+ plugins) | Active installs, 1–2 star complaint ratio, unresolved support & review snippets | [`olviklabs/wordpress-plugin-intelligence`](https://apify.com/olviklabs/wordpress-plugin-intelligence) |
-| **[Bluesky / AT Protocol Brand Intelligence](https://apify.com/olviklabs/bluesky-brand-intelligence)** | Official AT Protocol (`public.api.bsky.app`) | Public brand mentions, influencer posts, engagement metrics & LLM Markdown | [`olviklabs/bluesky-brand-intelligence`](https://apify.com/olviklabs/bluesky-brand-intelligence) |
+1. **`extract_sec_edgar_filings`** — Official US SEC EDGAR `10-K`, `10-Q`, `8-K`, & `Form 4` filings by stock ticker.
+2. **`analyze_saas_pricing`** — B2B SaaS `/pricing` tier detector, price-point extractor & SHA-256 change hash.
+3. **`search_government_tenders`** — Official World Bank Global & UK Contracts Finder (OCDS) RFP procurement search.
+4. **`analyze_appstore_aso`** — Apple iOS & Mac App Store keyword rankings, ratings & versions across 40+ storefronts.
+5. **`extract_llm_rag_docs`** — Clean technical documentation & `llms.txt` extractor for RAG context injection.
+6. **`analyze_chrome_extension`** — Chrome Web Store install counts, ratings & micro-SaaS opportunity analysis.
+7. **`mine_wordpress_plugin_churn`** — Official WordPress.org Plugin Directory installs & 1–2 star churn ratios.
+8. **`get_bluesky_author_feed`** — Public Bluesky AT Protocol author feed & engagement metrics.
 
 ---
 
-## Quickstart: Connect to Claude Desktop, Cursor, or Windsurf (Zero Local Install)
+## Architecture: Zero-Key Local Mode + Optional Cloud Scale
 
-1. Grab a free API token at [console.apify.com/settings/integrations](https://console.apify.com/settings/integrations).
-2. Paste into your `.cursor/mcp.json` or `claude_desktop_config.json`:
+- **Zero-Key Standalone Execution (Default):** Works immediately out of the box over `stdio` (`node dist/index.js` or Docker) with **zero API keys required**, querying official public endpoints (`data.sec.gov`, `itunes.apple.com`, `api.wordpress.org`, `search.worldbank.org`, `public.api.bsky.app`) directly.
+- **Optional Cloud Batch Scaling (`APIFY_TOKEN`):** Set `APIFY_TOKEN` in `env` to automatically offload large multi-company XBRL financial runs, multi-page sitemap crawls, and multi-country App Store review mining to Olvik Labs' cloud [Apify Actors](https://apify.com/olviklabs).
 
+---
+
+## Local & Docker Installation (Stdio MCP Server)
+
+### Option 1: Build & Run from Source
+```bash
+git clone https://github.com/yashik1991/olviklabs-b2b-mcp-servers.git
+cd olviklabs-b2b-mcp-servers
+npm install
+npm run build
+```
+
+Add to `claude_desktop_config.json` or `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
     "olviklabs-b2b-intelligence": {
-      "url": "https://mcp.apify.com/?actors=olviklabs/sec-edgar-filing-intelligence,olviklabs/saas-pricing-intelligence,olviklabs/gov-tenders-intelligence,olviklabs/appstore-aso-review-intelligence,olviklabs/llm-docs-rag-extractor,olviklabs/chrome-extension-analyzer,olviklabs/wordpress-plugin-intelligence,olviklabs/bluesky-brand-intelligence",
-      "headers": {
-        "Authorization": "Bearer YOUR_APIFY_API_TOKEN"
+      "command": "node",
+      "args": ["/absolute/path/to/olviklabs-b2b-mcp-servers/dist/index.js"],
+      "env": {
+        "APIFY_TOKEN": ""
       }
     }
   }
 }
 ```
 
-*(Want only 1–2 tools in context? Pass just the comma-separated Actor slugs you need in `?actors=...`!)*
+### Option 2: Run via Docker
+```bash
+docker build -t olviklabs-b2b-mcp .
+docker run -i --rm olviklabs-b2b-mcp
+```
 
 ---
 
-## Example Prompts Once Connected
-- **Equity & FinTech Research:** *"Pull NVDA and MSFT's latest 10-K/10-Q filings and compare their latest GAAP revenue, net income, and cash balances."*
-- **Competitive Intelligence:** *"Extract Linear, Asana, and Shortcut's current pricing pages and compare their per-seat tiers and enterprise gates."*
-- **GovTech Deal Sourcing:** *"Find open UK government and World Bank software & cybersecurity tenders closing next month."*
-- **Micro-SaaS Validation:** *"Check top Mac App Store apps for 'clipboard manager' across US, Germany, and Japan, plus 1–2 star user complaints."*
+## Cloud Actors & Extended Dataset Runs
+For scheduled cloud pipelines, n8n/Make workflows, or large batch runs, each tool also has a dedicated cloud Actor maintained by [Olvik Labs on Apify Store](https://apify.com/olviklabs):
+- [`olviklabs/sec-edgar-filing-intelligence`](https://apify.com/olviklabs/sec-edgar-filing-intelligence)
+- [`olviklabs/saas-pricing-intelligence`](https://apify.com/olviklabs/saas-pricing-intelligence)
+- [`olviklabs/gov-tenders-intelligence`](https://apify.com/olviklabs/gov-tenders-intelligence)
+- [`olviklabs/appstore-aso-review-intelligence`](https://apify.com/olviklabs/appstore-aso-review-intelligence)
+- [`olviklabs/llm-docs-rag-extractor`](https://apify.com/olviklabs/llm-docs-rag-extractor)
+- [`olviklabs/chrome-extension-analyzer`](https://apify.com/olviklabs/chrome-extension-analyzer)
+- [`olviklabs/wordpress-plugin-intelligence`](https://apify.com/olviklabs/wordpress-plugin-intelligence)
+- [`olviklabs/bluesky-brand-intelligence`](https://apify.com/olviklabs/bluesky-brand-intelligence)
 
 ---
 
-## Built By Olvik Labs
-- **Creator Hub:** [apify.com/olviklabs](https://apify.com/olviklabs)
-- **Website:** [olviklabs.com](https://olviklabs.com)
-- **Support:** [support@olviklabs.com](mailto:support@olviklabs.com)
+## License
+MIT © [Olvik Labs](https://olviklabs.com) (`support@olviklabs.com`)
