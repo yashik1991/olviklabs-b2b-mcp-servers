@@ -18,9 +18,14 @@ const READ_ONLY_ANNOTATIONS = {
     openWorldHint: true,
 };
 
-async function callApifyActorIfConfigured(actorSlug: string, input: Record<string, unknown>): Promise<unknown[] | null> {
-    const token = process.env.APIFY_TOKEN?.trim();
-    if (!token) return null;
+const MAX_FREE_PREVIEW_ITEMS = 2;
+
+function hasApifyToken(): boolean {
+    return Boolean(process.env.APIFY_TOKEN?.trim());
+}
+
+async function callApifyActor(actorSlug: string, input: Record<string, unknown>): Promise<unknown[]> {
+    const token = process.env.APIFY_TOKEN!.trim();
     const url = `https://api.apify.com/v2/acts/olviklabs~${actorSlug}/run-sync-get-dataset-items?format=json`;
     const res = await fetch(url, {
         method: 'POST',
@@ -30,9 +35,21 @@ async function callApifyActorIfConfigured(actorSlug: string, input: Record<strin
         },
         body: JSON.stringify(input),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`Apify Cloud run HTTP ${res.status}: ${body.slice(0, 200)}`);
+    }
     const items = (await res.json()) as unknown[];
-    return Array.isArray(items) ? items : null;
+    return Array.isArray(items) ? items : [];
+}
+
+function wrapFreePreview(actorSlug: string, rawItems: unknown[]) {
+    return {
+        mode: 'free_local_preview',
+        previewLimit: MAX_FREE_PREVIEW_ITEMS,
+        upgradeToFullDataset: `Set APIFY_TOKEN in your MCP env (https://console.apify.com/settings/integrations) to unlock full cloud datasets, XBRL financials, review mining, and stateful diffs via https://apify.com/olviklabs/${actorSlug}`,
+        items: rawItems.slice(0, MAX_FREE_PREVIEW_ITEMS),
+    };
 }
 
 // ---------------- Local Direct Implementations (Zero-Auth Standalone Execution) ----------------
@@ -163,7 +180,7 @@ async function runLlmDocsLocal(targetUrl: string) {
         .replace(/<[^>]+>/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-    return [{ url: targetUrl, charCount: clean.length, markdown: clean.slice(0, 6000) }];
+    return [{ url: targetUrl, charCount: clean.length, previewExcerpt: clean.slice(0, 600) }];
 }
 
 async function runChromeExtensionLocal(extensionIdOrUrl: string) {
@@ -429,30 +446,38 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
                 const tickers = (args.tickers as string[]) ?? ['AAPL'];
                 const formTypes = (args.formTypes as string[]) ?? ['10-K', '10-Q', '8-K'];
                 const maxFilingsPerCompany = Number(args.maxFilingsPerCompany ?? 5);
-                data =
-                    (await callApifyActorIfConfigured('sec-edgar-filing-intelligence', {
-                        tickers,
-                        formTypes,
-                        maxFilingsPerCompany,
-                        includeFinancialMetrics: true,
-                    })) ?? (await runSecEdgarLocal(tickers, formTypes, maxFilingsPerCompany));
+                data = hasApifyToken()
+                    ? await callApifyActor('sec-edgar-filing-intelligence', {
+                          tickers,
+                          formTypes,
+                          maxFilingsPerCompany,
+                          includeFinancialMetrics: true,
+                      })
+                    : wrapFreePreview(
+                          'sec-edgar-filing-intelligence',
+                          await runSecEdgarLocal(tickers.slice(0, 1), formTypes, MAX_FREE_PREVIEW_ITEMS),
+                      );
                 break;
             }
             case 'analyze_saas_pricing': {
                 const pricingUrls = (args.pricingUrls as string[]) ?? ['https://linear.app/pricing'];
-                data =
-                    (await callApifyActorIfConfigured('saas-pricing-intelligence', { pricingUrls })) ??
-                    (await runSaasPricingLocal(pricingUrls));
+                data = hasApifyToken()
+                    ? await callApifyActor('saas-pricing-intelligence', { pricingUrls })
+                    : wrapFreePreview('saas-pricing-intelligence', await runSaasPricingLocal(pricingUrls.slice(0, 1)));
                 break;
             }
             case 'search_government_tenders': {
                 const keywords = (args.keywords as string[]) ?? ['software'];
                 const maxTenders = Number(args.maxTenders ?? 10);
-                data =
-                    (await callApifyActorIfConfigured('gov-tenders-intelligence', {
-                        keywords,
-                        maxTendersPerSource: maxTenders,
-                    })) ?? (await runGovTendersLocal(keywords, maxTenders));
+                data = hasApifyToken()
+                    ? await callApifyActor('gov-tenders-intelligence', {
+                          keywords,
+                          maxTendersPerSource: maxTenders,
+                      })
+                    : wrapFreePreview(
+                          'gov-tenders-intelligence',
+                          await runGovTendersLocal(keywords, MAX_FREE_PREVIEW_ITEMS),
+                      );
                 break;
             }
             case 'analyze_appstore_aso': {
@@ -460,47 +485,60 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
                 const country = String(args.country ?? 'us');
                 const entity = String(args.entity ?? 'software');
                 const limit = Number(args.limit ?? 10);
-                data =
-                    (await callApifyActorIfConfigured('appstore-aso-review-intelligence', {
-                        searchTerms: [searchTerm],
-                        countries: [country],
-                        entity,
-                        maxAppsPerTerm: limit,
-                    })) ?? (await runAppStoreAsoLocal(searchTerm, country, entity, limit));
+                data = hasApifyToken()
+                    ? await callApifyActor('appstore-aso-review-intelligence', {
+                          keywords: [searchTerm],
+                          countries: [country],
+                          entity,
+                          maxAppsPerKeyword: limit,
+                          extractReviews: true,
+                      })
+                    : wrapFreePreview(
+                          'appstore-aso-review-intelligence',
+                          await runAppStoreAsoLocal(searchTerm, country, entity, MAX_FREE_PREVIEW_ITEMS),
+                      );
                 break;
             }
             case 'extract_llm_rag_docs': {
                 const url = String(args.url ?? 'https://modelcontextprotocol.io/introduction');
-                data =
-                    (await callApifyActorIfConfigured('llm-docs-rag-extractor', {
-                        startUrls: [url],
-                        maxPages: 5,
-                    })) ?? (await runLlmDocsLocal(url));
+                data = hasApifyToken()
+                    ? await callApifyActor('llm-docs-rag-extractor', {
+                          startUrls: [url],
+                          maxPages: 10,
+                      })
+                    : wrapFreePreview('llm-docs-rag-extractor', await runLlmDocsLocal(url));
                 break;
             }
             case 'analyze_chrome_extension': {
                 const ext = String(args.extensionUrlOrId ?? 'bcjindcccaagfpapjjmafapmmgkkhgoa');
-                data =
-                    (await callApifyActorIfConfigured('chrome-extension-analyzer', { extensions: [ext] })) ??
-                    (await runChromeExtensionLocal(ext));
+                data = hasApifyToken()
+                    ? await callApifyActor('chrome-extension-analyzer', { extensions: [ext] })
+                    : wrapFreePreview('chrome-extension-analyzer', await runChromeExtensionLocal(ext));
                 break;
             }
             case 'mine_wordpress_plugin_churn': {
                 const searchQuery = String(args.searchQuery ?? 'seo');
                 const maxPlugins = Number(args.maxPlugins ?? 5);
-                data =
-                    (await callApifyActorIfConfigured('wordpress-plugin-intelligence', { searchQuery, maxPlugins })) ??
-                    (await runWordPressChurnLocal(searchQuery, maxPlugins));
+                data = hasApifyToken()
+                    ? await callApifyActor('wordpress-plugin-intelligence', { searchQuery, maxPlugins })
+                    : wrapFreePreview(
+                          'wordpress-plugin-intelligence',
+                          await runWordPressChurnLocal(searchQuery, MAX_FREE_PREVIEW_ITEMS),
+                      );
                 break;
             }
             case 'get_bluesky_author_feed': {
                 const handle = String(args.handle ?? 'bsky.app');
                 const limit = Number(args.limit ?? 10);
-                data =
-                    (await callApifyActorIfConfigured('bluesky-brand-intelligence', {
-                        handles: [handle],
-                        maxPostsPerTarget: limit,
-                    })) ?? (await runBlueskyFeedLocal(handle, limit));
+                data = hasApifyToken()
+                    ? await callApifyActor('bluesky-brand-intelligence', {
+                          handles: [handle],
+                          maxPostsPerTarget: limit,
+                      })
+                    : wrapFreePreview(
+                          'bluesky-brand-intelligence',
+                          await runBlueskyFeedLocal(handle, MAX_FREE_PREVIEW_ITEMS),
+                      );
                 break;
             }
             default:

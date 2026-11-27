@@ -12,7 +12,7 @@ const headers = {
 
 const CANARIES = [
     { slug: 'olviklabs~bluesky-brand-intelligence', input: { handles: ['bsky.app'], maxPostsPerTarget: 2 } },
-    { slug: 'olviklabs~appstore-aso-review-intelligence', input: { searchTerms: ['paste'], countries: ['us'], maxAppsPerTerm: 2, includeReviews: false } },
+    { slug: 'olviklabs~appstore-aso-review-intelligence', input: { keywords: ['paste'], countries: ['us'], maxAppsPerKeyword: 2, extractReviews: false } },
     { slug: 'olviklabs~llm-docs-rag-extractor', input: { startUrls: ['https://modelcontextprotocol.io/introduction'], discoverSitemapOrLlmsTxt: false, maxPages: 1 } },
     { slug: 'olviklabs~sec-edgar-filing-intelligence', input: { tickers: ['AAPL'], formTypes: ['10-K'], maxFilingsPerCompany: 1, includeFinancialMetrics: false } },
     { slug: 'olviklabs~saas-pricing-intelligence', input: { pricingUrls: ['https://linear.app/pricing'], maxMarkdownChars: 2000 } },
