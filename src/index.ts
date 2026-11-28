@@ -163,8 +163,9 @@ async function runAppStoreAsoLocal(term: string, country: string, entity: string
         name: app.trackName,
         seller: app.sellerName,
         price: app.price,
-        averageUserRating: app.averageUserRating,
-        userRatingCount: app.userRatingCount,
+        averageUserRating:
+            app.averageUserRating ?? app.averageUserRatingForCurrentVersion ?? 'not_exposed_by_apple_api',
+        userRatingCount: app.userRatingCount ?? app.userRatingCountForCurrentVersion ?? 0,
         version: app.version,
         url: app.trackViewUrl,
     }));

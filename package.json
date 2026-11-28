@@ -1,6 +1,7 @@
 {
   "name": "olviklabs-b2b-mcp-servers",
-  "version": "1.1.0",
+  "version": "1.1.1",
+  "mcpName": "io.github.yashik1991/olviklabs-b2b-mcp-servers",
   "type": "module",
   "description": "Open-source Model Context Protocol (MCP) server providing 8 B2B, financial (SEC EDGAR), GovTech tenders, SaaS pricing, App Store ASO, Chrome Web Store, WordPress churn, Bluesky, and RAG documentation tools.",
   "homepage": "https://olviklabs.com",
@@ -10,6 +11,7 @@
   },
   "license": "MIT",
   "bin": {
+    "olviklabs-b2b-mcp-servers": "./dist/index.js",
     "olviklabs-mcp": "./dist/index.js"
   },
   "files": [
@@ -19,6 +21,7 @@
   ],
   "scripts": {
     "build": "tsc && chmod +x dist/index.js",
+    "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },

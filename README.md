@@ -24,29 +24,31 @@ An open-source **TypeScript Model Context Protocol (`@modelcontextprotocol/sdk`)
 
 ---
 
-## Local & Docker Installation (Stdio MCP Server)
+## Quick 1-Line `npx` Installation (Claude Desktop, Cursor & Windsurf)
 
-### Option 1: Build & Run from Source
-```bash
-git clone https://github.com/yashik1991/olviklabs-b2b-mcp-servers.git
-cd olviklabs-b2b-mcp-servers
-npm install
-npm run build
-```
+Add directly to `claude_desktop_config.json` or `.cursor/mcp.json` — **zero `git clone` or API keys required** for instant 2-row local previews (add your optional `APIFY_TOKEN` to unlock full cloud dataset batch runs):
 
-Add to `claude_desktop_config.json` or `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
     "olviklabs-b2b-intelligence": {
-      "command": "node",
-      "args": ["/absolute/path/to/olviklabs-b2b-mcp-servers/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "github:yashik1991/olviklabs-b2b-mcp-servers"],
       "env": {
         "APIFY_TOKEN": ""
       }
     }
   }
 }
+```
+
+*(Once installed from npm, `"args": ["-y", "olviklabs-b2b-mcp-servers"]` is also supported.)*
+
+### Option 2: Build from Source or Docker
+```bash
+git clone https://github.com/yashik1991/olviklabs-b2b-mcp-servers.git
+cd olviklabs-b2b-mcp-servers
+npm install && npm run build
 ```
 
 ### Option 2: Run via Docker

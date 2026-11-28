@@ -1,9 +1,9 @@
-name: 48-Hour Apify Actor Health Canary
+name: Weekly Apify Actor Health Canary
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 3 */2 * *'
+    - cron: '17 3 * * 1'
 
 jobs:
   canary:
