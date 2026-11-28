@@ -33,7 +33,7 @@ Add directly to `claude_desktop_config.json` or `.cursor/mcp.json` — **zero `g
   "mcpServers": {
     "olviklabs-b2b-intelligence": {
       "command": "npx",
-      "args": ["-y", "github:yashik1991/olviklabs-b2b-mcp-servers"],
+      "args": ["-y", "olviklabs-b2b-mcp-servers"],
       "env": {
         "APIFY_TOKEN": ""
       }
@@ -42,7 +42,7 @@ Add directly to `claude_desktop_config.json` or `.cursor/mcp.json` — **zero `g
 }
 ```
 
-*(Once installed from npm, `"args": ["-y", "olviklabs-b2b-mcp-servers"]` is also supported.)*
+*(Published on npm as [`olviklabs-b2b-mcp-servers`](https://www.npmjs.com/package/olviklabs-b2b-mcp-servers); `github:yashik1991/olviklabs-b2b-mcp-servers` is also supported.)*
 
 ### Option 2: Build from Source or Docker
 ```bash
